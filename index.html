@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>tweet取得</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    // ボタンのクリックイベントを設定 
+    $("#getRSS").click(function(){
+      var user = $("#user").val();
+      getTweet(user);
+    });
+
+    // ユーザ一覧の追加
+    getUserList();
+  });
+
+  // tweet取得サービスの呼び出し
+  function getTweet(user) {
+    var url = "./get_tweet.php?user=" + user;
+    $.getJSON(url, function(data) {
+      $("#tweet").empty();
+      for(var cnt in data) {
+        $("#tweet").append(data[cnt].guid  + "<br>\n");
+        $("#tweet").append(data[cnt].date  + "<br>\n");
+        $("#tweet").append(data[cnt].title + "<br>\n");
+        $("#tweet").append(data[cnt].link  + "<br>\n");
+      }
+    });
+  }
+
+  // DBにtweetが保存してあるユーザの一覧を取得
+  function getUserList() {
+    var url = "./get_user.php";
+    $.getJSON(url, function(data) {
+      $("#twitter_user_id").empty();
+      for(var cnt in data) {
+        var user = data[cnt].user;
+        var a = $(document.createElement("a")).click(clickLink).append(user).attr("href", "#");
+//        var li = '<li><a href="#" id="user_id_link">' + user + '</a></li>';
+        var li = $(document.createElement("li")).append(a);
+        $("#twitter_user_id").append(li);
+      }
+    });
+  }
+
+  // リンクがクリックされた場合の処理
+  function clickLink() {
+      var user = $(this).text();
+      getTweet(user);
+  }
+</script>
+</head>
+
+<body>
+
+<header>
+  <h1>tweet取得</h1>
+</header>
+
+<nav>
+ <input type="text" id="user" name="user" placeholder="input twitter user id">
+ <input type="button" id="getRSS" value="get tweet">
+ <ul id="twitter_user_id">
+ </ul>
+</nav>
+
+<section id="tweet">
+</section>
+
+<footer>
+<p></p>
+</footer>
+
+</body>
+
+</html>

@@ -43,8 +43,8 @@
                                                       .attr("href", data[cnt].link);
           var date    = $(document.createElement("div")).append(link)
                                                         .attr("id", "date");
-          article.append(date);
           article.append(title);
+          article.append(date);
           $("#tweet").append(article);
         }
       }

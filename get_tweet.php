@@ -16,7 +16,8 @@
   // 指定ユーザの最新のタイムラインをRSSから取得しDBに保存
   if(!$twitter->getRSS($user)) {
     // RSSの取得失敗
-    die('RSSの取得に失敗');
+    echo null;
+    exit;
   }
 
   // DBに保存してあるタイムラインを表示

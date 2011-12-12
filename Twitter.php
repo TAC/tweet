@@ -27,6 +27,12 @@ class Twitter
     }
   }
 
+  // デストラクタ
+  public function __destruct() {
+    // DB切断
+    $this->dbh->close();
+  }
+
   // 指定ユーザの最新のRSSを取得し、DBへ保存する
   public function getRSS($user){
 
@@ -41,10 +47,20 @@ class Twitter
     // RSSのURLを作成
     $rss_url = sprintf($this->twitter_url, $user);
 
+    // RSSのURLが存在するかチェック
+    $header = get_headers($rss_url);
+    if (!strstr($header[0], '200')) {
+      return false;
+    }
+
     // RSSからデータを取得
     $rssdata = simplexml_load_file($rss_url);
+    if (!$rssdata) {
+      return false;
+    }
 
     // 取得済みより後のguidのtweetを取得する
+    $tweets = array();
     foreach ($rssdata->channel->item as $rssitem) { 
           $words = explode("/", $rssitem->guid);
           $guid = end($words);
@@ -74,9 +90,6 @@ class Twitter
       $stmt->clear();
     }
 
-    // DB切断
-    sqlite_close($dbh);
-
     return true;
   }
 
@@ -88,12 +101,13 @@ class Twitter
     $result = $this->dbh->query($sql);
 
     // tweetを配列に変換
+    $tweets = array();
     if($result){
       while($row = $result->fetchArray()) {
-        $tweets[] = array('guid'  => $row[guid],
-                          'date'  => $row[date],
-                          'title' => $row[title],
-                          'link'  => $row[link]);
+        $tweets[] = array('guid'  => $row['guid'],
+                          'date'  => $row['date'],
+                          'title' => $row['title'],
+                          'link'  => $row['link']);
       }
     }
 
@@ -110,7 +124,7 @@ class Twitter
     // ユーザ一覧を配列へ入れる
     if($result){
       while($row = $result->fetchArray()) {
-        $user_list[] = array('user'=> $row[user]);
+        $user_list[] = array('user'=> $row['user']);
       }
     }
 

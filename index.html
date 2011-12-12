@@ -15,7 +15,7 @@
       getTweet(user);
     });
 
-    // ユーザ一覧の追加
+    // ユーザ一覧の更新
     getUserList();
   });
 
@@ -24,13 +24,26 @@
     var url = "./get_tweet.php?user=" + user;
     $.getJSON(url, function(data) {
       $("#tweet").empty();
-      for(var cnt in data) {
-        $("#tweet").append(data[cnt].guid  + "<br>\n");
-        $("#tweet").append(data[cnt].date  + "<br>\n");
-        $("#tweet").append(data[cnt].title + "<br>\n");
-        $("#tweet").append(data[cnt].link  + "<br>\n");
+      if(data == null) {
+        // tweetがない場合はエラーを表示する
+        $("#tweet").append("tweetの取得に失敗");
+      } else {
+        for(var cnt in data) {
+          var article = $(document.createElement("article"));
+          var title   = $(document.createElement("div")).append(data[cnt].title);
+          var link    = $(document.createElement("a")).append(data[cnt].date)
+                                                      .attr("href", data[cnt].link);
+          var date    = $(document.createElement("div")).append(link)
+                                                        .attr("id", "date");
+          article.append(date);
+          article.append(title);
+          $("#tweet").append(article);
+        }
       }
     });
+
+    // ユーザ一覧の更新
+    getUserList();
   }
 
   // DBにtweetが保存してあるユーザの一覧を取得
@@ -41,7 +54,6 @@
       for(var cnt in data) {
         var user = data[cnt].user;
         var a = $(document.createElement("a")).click(clickLink).append(user).attr("href", "#");
-//        var li = '<li><a href="#" id="user_id_link">' + user + '</a></li>';
         var li = $(document.createElement("li")).append(a);
         $("#twitter_user_id").append(li);
       }

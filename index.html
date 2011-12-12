@@ -9,6 +9,14 @@
 <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 <script type="text/javascript">
   $(document).ready(function(){
+    // テキストエリアのエンターイベントを設定
+    $("#user").keydown(function(e){
+      if(e.keyCode == 13) {
+        var user = $("#user").val();
+        getTweet(user);
+      }
+    });
+
     // ボタンのクリックイベントを設定 
     $("#getRSS").click(function(){
       var user = $("#user").val();
